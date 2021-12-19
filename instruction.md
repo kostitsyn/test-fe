@@ -1,15 +1,25 @@
 # Инструкция
 
-1. Создаём и выполняем миграции:
+1. Создаём виртуальное окружение:
 
-```python manage.py makemigrations```
+```virtualenv env```
+
+2. Активируем виртуальное окружение и устанавилваем зависимости:
+
+```source env/bin/activate```
+
+```pip install -r requirements.txt```
+
+3. Создаём и выполняем миграции:
+
+```python manage.py makemigrations mainapp```
 
 ```python manage.py migrate```
 
-2. Запускаем скрипт по заполнению БД данными из файла *data.json*:
+4. Запускаем скрипт по заполнению БД данными из файла *data.json*:
 
 ```python manage.py fill_db```
 
-3. Запускаем проект:
+5. Запускаем проект:
 
 ```python manage.py runserver```
