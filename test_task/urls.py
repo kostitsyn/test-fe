@@ -21,8 +21,9 @@ import mainapp.views as mainapp
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('<page>/', mainapp.TableView.as_view(), name='table'),
+    path('<int:page>/', mainapp.TableView.as_view(), name='table'),
     path('', RedirectView.as_view(url='1/')),
     path('temperature/<int:day>/', mainapp.get_temperature, name='get_temperature'),
-    path('search/<str:name>/', mainapp.TableView.as_view(), name='search_by_name'),
+    path('search/', mainapp.TableFilterView.as_view(), name='search_by_name'),
+    path('sorted/<int:page>/<str:direct>/<str:num_col>/', mainapp.SortedListView.as_view(), name='sorted'),
 ]

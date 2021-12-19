@@ -1,67 +1,60 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    {% block css %}
-         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    {% endblock %}
-    {% block js %}
-        <script
-          src="https://code.jquery.com/jquery-3.6.0.min.js"
-          integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-          crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-        <script src = "{% static 'js/script.js' %}"></script>
-    {% endblock %}
-</head>
-<body>
-
-    <table border="1">
-        <th>User</th>
-        {% with ''|center:31 as range %}
-        {% for i in range %}
-            <th class="day" data-toggle="modal" data-target="#modal"><a href="#">{{ forloop.counter }}</a></th>
-        {% endfor %}
-        {% endwith %}
-        <th>Monthly total</th>
-        {% for object in object_list %}
-            <tr>
-                <td>{{ object.fullname }}</td>
-                {% for day in object.days.values %}
-                    <td>{{ day }}</td>
+{% extends 'mainapp/base.html' %}
+{% load my_tags %}
+{% block content %}
+    <div class="my-container">
+        <table class="table table-bordered" border="1">
+            <thead>
+                <th class="name-col bg-light">User</th>
+                {% for i in 31|get_list %}
+                    <th class="day"><a href="#" data-toggle="modal" data-target="#modal">{{ forloop.counter }}</a></th>
                 {% endfor %}
-                <td>{{ object.total_time }}</td>
+                <th class="total-col bg-light">Monthly total</th>
+            </thead>
+            {% for object in object_list %}
+                <tr>
+                    <td class="name-col bg-light">{{ object.name }}</td>
+                    {% for day in object.day_set.all %}
+                        <td><span class="time">{{ day.get_time }}</span></td>
+                    {% endfor %}
+                    <td class="total-col bg-light">{{ object.get_total_time }}</td>
+                </tr>
+
+            {% endfor %}
+            <tr>
+                <td></td>
+                {% for i in 31|get_list %}
+                    <td>
+                        <a href="{% url 'sorted' page_obj.number 'up' forloop.counter %}">&uArr;</a><br>
+                        <a href="{% url 'sorted' page_obj.number 'down' forloop.counter %}">&dArr;</a>
+                    </td>
+                {% endfor %}
             </tr>
-        {% endfor %}
-    </table>
+        </table>
 
-    <div class="paginator">
-        {% if page_obj.has_previous %}
-            <a href="{% url 'table' page_obj.previous_page_number %}"><</a>
-        {% endif %}
-        <span class="'current">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-            <a href="{% url 'table' page_obj.next_page_number %}">></a>
-        {% endif %}
-    </div>
-
-    <label for="nameFind">Поиск по имени</label>
-    <input id="nameFind">
-    <button class="search">Искать</button>
-
-    <div class="modal" id="modal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-              <div class="abc"></div>
-              <button type="button" class="btn btn-primary" id="cancel" data-dismiss="modal">Close</button>
-            </div>
-          </div>
+        <div class="paginator">
+            {% if page_obj.has_previous %}
+                <a href="{% url 'table' page_obj.previous_page_number %}"><</a>
+            {% endif %}
+            <span class="'current">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="{% url 'table' page_obj.next_page_number %}">></a>
+            {% endif %}
         </div>
-      </div>
 
-</body>
-</html>
+        <form action="{% url 'search_by_name' %}" method="get">
+            {% csrf_token %}
+            <label for="nameFind">Поиск по имени</label>
+            <input name="searchname" id="nameFind">
+            <button type="submit" class="search">Искать</button>
+        </form>
+
+        <div class="modal" id="modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="msg"></div>
+                  <button type="button" class="btn btn-primary" id="cancel" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
